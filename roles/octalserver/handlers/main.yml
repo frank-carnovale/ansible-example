@@ -1,0 +1,14 @@
+---
+
+- name: bounce nginx
+  service: name=nginx state=restarted
+
+- name: bounce network
+  service: name=network state=restarted
+
+- name: hot-start the app
+  become_user: frankc
+  shell: source /etc/profile && MOJO_REVERSE_PROXY=1 MOJO_LOG_LEVEL=debug hypnotoad bin/stuff
+  args:
+    chdir: /home/frankc/stuff
+    executable: /bin/bash

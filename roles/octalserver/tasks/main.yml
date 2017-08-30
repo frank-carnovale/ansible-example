@@ -1,0 +1,122 @@
+---
+
+- name: install nginx
+  yum: name=nginx state=latest
+  notify:
+    - bounce nginx
+
+- name: install lots of packages
+  yum: name={{ item }} state=latest
+  with_items:
+    - git
+    - gcc
+    - perl-core
+    - perl-CPAN
+    - perl-DBI
+    - perl-DBD-Pg
+    - perl-DateTime*
+    - perl-IO-Socket*
+    - perl-JSON*
+    - perl-Lingua*
+    - perl-Net-Amazon*
+    - perl-SQL-Abstract
+    - perl-URI
+    - perl-libwww-perl
+    - perl-YAML
+    - postgresql94-server
+    - postgresql94-devel
+    - postgresql94-docs
+  notify:
+    - hot-start the app
+
+- name: create app-owner
+  user: name=frankc comment="Frank Carnovale" uid=1000 group=users
+
+- name: deliver app-owner id files
+  copy: src=home/frankc/ dest=/home/frankc force=yes group=users owner=frankc
+
+- name: clone ec-user authorized keys
+  copy: remote_src=True src=/home/ec2-user/.ssh/authorized_keys dest=/home/frankc/.ssh group=users owner=frankc
+
+- name: assert mode on app-owner home dir
+  file: path=/home/frankc mode=0755
+
+- name: assert mode on app-owner .ssh dir
+  file: path=/home/frankc/.ssh mode=0700
+
+- name: assert mode on app-owner .ssh files
+  file: path=/home/frankc/.ssh/{{item}} mode=0400
+  with_items:
+    - id_rsa
+    - authorized_keys
+
+- name: deliver all etc config files
+  # copy first time; synch later.
+  #synchronize: src=etc dest=/ archive=no recursive=yes perms=yes times=yes
+  copy: src=etc dest=/ force=yes owner=root group=root
+  notify:
+    - bounce nginx
+
+- name: append to global vim options
+  blockinfile:
+    dest: /etc/vimrc
+    insertafter: EOF
+    marker: "\" {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      set ai ts=4 sw=4 expandtab background=dark
+
+- name: install root credentials
+  copy: src=home/root/ dest=/root force=yes group=root owner=root
+
+- name: create app log dir
+  file: path=/var/log/stuff mode=0775 group=users state=directory
+
+- name: assert hostname
+  hostname: name=octalfutures.com
+  notify:
+    - bounce network
+
+- name: update all packages
+  yum: name=* state=latest
+
+- name: Get the App
+  become_user: frankc
+  git: repo=ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/stuff dest=/home/frankc/stuff accept_hostkey=yes force=yes
+  notify:
+    - hot-start the app
+
+- name: loadup database
+  become_user: postgres
+  command: /home/frankc/stuff/sql/little-bang
+  args:
+    creates: /var/lib/pgsql94/data/base
+
+- name: setup the app environment
+  become_user: frankc
+  shell: "source /etc/profile && s3cl sync dbnet-stuff:s3sync/ ~ && restore-quandl"
+  args:
+    creates: /home/frankc/s3sync
+    executable: /bin/bash
+
+- name: restore 'local' bin
+  synchronize: src=/usr/local/bin dest=/usr/local/
+
+- name: restore 'local' language libraries
+  synchronize: src=/usr/local/{{item}}/perl5 dest=/usr/local/{{item}}/
+  with_items:
+    - share
+    - lib64
+
+- name: enable services
+  service: name={{item}} enabled=yes state=started
+  with_items:
+    - postgresql94
+    - nginx
+
+- name: check app up
+  shell: "pf=/tmp/hypnotoad_stuff.pid; [ -f $pf ] && ps $(cat $pf) || echo APP-NOT-UP"
+  register: app_up
+  changed_when: "'APP-NOT-UP' in app_up.stdout"
+  notify:
+    - hot-start the app
+
