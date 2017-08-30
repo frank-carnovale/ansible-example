@@ -1,0 +1,9 @@
+---
+
+- name: Configure Leodis Apache
+  hosts: leodis
+  become: True
+  gather_facts: True
+  roles:
+    - leodis
+

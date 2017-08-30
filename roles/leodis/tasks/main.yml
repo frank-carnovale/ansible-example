@@ -1,0 +1,50 @@
+---
+
+- name: install lots of packages
+  yum: name={{ item }} state=latest
+  with_items:
+    - git
+    - gcc
+    - perl-core
+    - perl-CPAN
+    - perl-DBI
+    - perl-DBD-Pg
+    - perl-DateTime*
+    - perl-IO-Socket*
+    - perl-JSON*
+    - perl-Lingua*
+    - perl-Net-Amazon*
+    - perl-SQL-Abstract
+    - perl-URI
+    - perl-libwww-perl
+    - perl-YAML
+    - postgresql94-server
+    - postgresql94-devel
+    - postgresql94-docs
+  notify:
+    - hot-start the app
+
+- name: assert mode on app-owner .ssh files
+  file: path=/home/frankc/.ssh/{{item}} mode=0400
+  with_items:
+    - id_rsa
+    - authorized_keys
+
+- name: deliver all etc config files
+  synchronize: src=etc dest=/ archive=no recursive=yes perms=yes times=yes
+  notify:
+    - bounce nginx
+
+- name: enable services
+  service: name={{item}} enabled=yes state=started
+  with_items:
+    - postgresql94
+    - nginx
+
+- name: check app up
+  shell: "pf=/tmp/hypnotoad_stuff.pid; [ -f $pf ] && ps $(cat $pf) || echo APP-NOT-UP"
+  register: app_up
+  changed_when: "'APP-NOT-UP' in app_up.stdout"
+  notify:
+    - hot-start the app
+
