@@ -21,6 +21,11 @@
   synchronize:
     src:   etc/apache2/{{item}}
     dest: /etc/apache2
+    recursive: yes
+    delete: yes
+    links: yes
+    perms: yes
+    times: yes
   with_items:
     - conf-enabled
     - conf-available 
