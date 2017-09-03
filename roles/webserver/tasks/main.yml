@@ -1,9 +1,21 @@
 ---
 
-- name: install required packages
-  apt: name={{ item }} state=latest
+- name: disable old-style apache (httpd) service
+  service: name=httpd enabled=no state=stopped
+  when: inventory_hostname in groups['old_webservers']
+
+- name: install required packages (so far apache2 only)
+  apt: name=apache2 state=latest
+
+- name: ensure minimal apache dynamic modules enabled (beyond default install)
+  file:
+    src:          ../mods-available/{{item}}.load
+    dest: /etc/apache2/mods-enabled/{{item}}.load
+    force: yes
+    state: link
   with_items:
-    - apache2
+    - proxy
+    - proxy_http
 
 - name: deliver apache etc/config files manageable by app teams
   synchronize:
@@ -17,36 +29,19 @@
   notify:
     - bounce apache
 
-- name: ensure minimal apache dynamic modules enabled (beyond default install)
-  file:
-    src:          ../mods-available/{{item}}.load
-    dest: /etc/apache2/mods-enabled/{{item}}.load
-    force: yes
-    state: link
-  with_items:
-    - proxy
-    - proxy_http
-  notify:
-    - bounce apache
-
 - name: replace installed welcome page with any required static content
   synchronize:
     src:   var/www/html
     dest: /var/www/
+  notify:
+    - bounce apache
+
+- name: ensure new-style apache2 service running
+  service: name=apache2 enabled=yes state=started
 
 - meta: flush_handlers
 
-- name: enable new-style apache2 services
-  service: name={{item}} enabled=yes state=started
-  with_items:
-    - apache2
-
-- name: disable old-style apache (httpd) services
-  service: name={{item}} enabled=no state=stopped
-  with_items:
-    - httpd
-
-- name: check webserver is up
+- name: check expected home page is served
   uri:
     url: http://{{ inventory_hostname }}
     return_content: yes
