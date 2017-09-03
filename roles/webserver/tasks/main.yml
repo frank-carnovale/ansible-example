@@ -17,6 +17,18 @@
   notify:
     - bounce apache
 
+- name: ensure minimal apache dynamic modules enabled (beyond default install)
+  file:
+    src:          ../mods-available/{{item}}.load
+    dest: /etc/apache2/mods-enabled/{{item}}.load
+    force: yes
+    state: link
+  with_items:
+    - proxy
+    - proxy_http
+  notify:
+    - bounce apache
+
 - name: replace installed welcome page with any required static content
   synchronize:
     src:   var/www/html
