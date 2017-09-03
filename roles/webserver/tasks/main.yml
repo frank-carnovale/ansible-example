@@ -1,0 +1,41 @@
+---
+
+- name: install required packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - apache2
+
+- name: deliver apache etc/config files manageable by app teams
+  synchronize:
+    src:   etc/apache2/{{item}}
+    dest: /etc/apache2
+  with_items:
+    - conf-enabled
+    - conf-available 
+    - sites-enabled
+    - sites-available 
+  notify:
+    - bounce apache
+
+- name: replace installed welcome page with any required static content
+  synchronize:
+    src:   var/www/html
+    dest: /var/www/
+
+- meta: flush_handlers
+
+- name: enable services
+  service: name={{item}} enabled=yes state=started
+  with_items:
+    - apache2
+
+- name: check webserver is up
+  uri:
+    url: http://{{ inventory_hostname }}
+    return_content: yes
+    status_code: 200
+  register: result
+
+- name: Simplified Test of Home Page Content
+  fail:
+  when:  "'Welcome' not in result.content"

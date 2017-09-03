@@ -1,0 +1,9 @@
+---
+
+- name: Configure NewEra Leodis Apache Servers
+  hosts: new_webservers
+  become: True
+  gather_facts: True
+  roles:
+    - webserver
+

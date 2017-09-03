@@ -1,5 +1,0 @@
----
-
-- name: bounce apache
-  service: name=httpd state=restarted
-

@@ -1,0 +1,9 @@
+---
+
+- name: Configure Legacy Leodis Apache Servers
+  hosts: old_webservers
+  become: True
+  gather_facts: True
+  roles:
+    - webserver
+
