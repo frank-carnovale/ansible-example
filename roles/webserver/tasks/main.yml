@@ -26,6 +26,8 @@
     links: yes
     perms: yes
     times: yes
+    owner: no
+    group: no
   with_items:
     - conf-enabled
     - conf-available 
