@@ -36,10 +36,15 @@
 
 - meta: flush_handlers
 
-- name: enable services
+- name: enable new-style apache2 services
   service: name={{item}} enabled=yes state=started
   with_items:
     - apache2
+
+- name: disable old-style apache (httpd) services
+  service: name={{item}} enabled=no state=stopped
+  with_items:
+    - httpd
 
 - name: check webserver is up
   uri:
