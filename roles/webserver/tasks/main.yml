@@ -5,9 +5,16 @@
     src:   etc/apt/apt.conf.d
     dest: /etc/apt/
 
-- name: disable old-style apache (httpd) service
-  service: name=httpd enabled=no state=stopped
-  when: inventory_hostname in groups['old_webservers']
+- name: find if old-style apache (httpd) service exists
+  stat: path={{old_httpd_runner}}
+  register: old_httpd
+
+- name: stop old-style apache (httpd) service
+  command: "{{old_httpd_runner}} stop"
+  when: old_httpd.stat.exists
+
+- name: remove old-style apache (httpd) service
+  file: path={{old_httpd_runner}} state=absent
 
 - name: install required packages (so far apache2 only)
   apt: name=apache2 state=latest
