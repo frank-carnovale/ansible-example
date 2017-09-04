@@ -1,0 +1,171 @@
+[frankc@octalfutures infinity]$ ansible-playbook webservers.yml
+ _______________________________________________
+< PLAY [Configure NewEra Leodis Apache Servers] >
+ -----------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ ________________________
+< TASK [Gathering Facts] >
+ ------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com]
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+ _____________________________________________________________
+/ TASK [webserver : enable auto security upgrades via package \
+\ management strategy]                                        /
+ -------------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com]
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+ ____________________________________________________________
+/ TASK [webserver : find if old-style apache (httpd) service \
+\ exists]                                                    /
+ ------------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com]
+ __________________________________________________________
+< TASK [webserver : stop old-style apache (httpd) service] >
+ ----------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+skipping: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+skipping: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com]
+ ____________________________________________________________
+< TASK [webserver : remove old-style apache (httpd) service] >
+ ------------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com]
+ _____________________________________________________________
+/ TASK [webserver : install required packages (so far apache2 \
+\ only)]                                                      /
+ -------------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com]
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+ _________________________________________________________
+/ TASK [webserver : ensure minimal apache dynamic modules \
+\ enabled (beyond default install)]                       /
+ ---------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com] => (item=proxy)
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com] => (item=proxy)
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com] => (item=proxy_http)
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com] => (item=proxy_http)
+ ___________________________________________________
+/ TASK [webserver : deliver apache etc/config files \
+\ manageable by app teams]                          /
+ ---------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com] => (item=conf-enabled)
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com] => (item=conf-enabled)
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com] => (item=conf-available)
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com] => (item=conf-available)
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com] => (item=sites-enabled)
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com] => (item=sites-enabled)
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com] => (item=sites-available)
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com] => (item=sites-available)
+ ___________________________________________________________
+/ TASK [webserver : replace installed welcome page with any \
+\ required static content]                                  /
+ -----------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com]
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+ _____________________________________________________________
+< TASK [webserver : ensure new-style apache2 service running] >
+ -------------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+ok: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com]
+ _______________________________________________________
+< TASK [webserver : check expected home page is served] >
+ -------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ok: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+fatal: [ec2-34-240-13-232.eu-west-1.compute.amazonaws.com]: FAILED! => {"changed": false, "connection": "close", "content": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>503 Service Unavailable</title>\n</head><body>\n<h1>Service Unavailable</h1>\n<p>The server is temporarily unable to service your\nrequest due to maintenance downtime or capacity\nproblems. Please try again later.</p>\n<hr>\n<address>Apache/2.4.18 (Ubuntu) Server at ec2-34-240-13-232.eu-west-1.compute.amazonaws.com Port 80</address>\n</body></html>\n", "content_length": "414", "content_type": "text/html; charset=iso-8859-1", "date": "Mon, 04 Sep 2017 11:18:43 GMT", "failed": true, "msg": "Status code was not [200]: HTTP Error 503: Service Unavailable", "redirected": false, "server": "Apache/2.4.18 (Ubuntu)", "status": 503, "url": "http://ec2-34-240-13-232.eu-west-1.compute.amazonaws.com"}
+ _________________________________________________________
+< TASK [webserver : Simplified Test of Home Page Content] >
+ ---------------------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+skipping: [ec2-34-250-227-208.eu-west-1.compute.amazonaws.com]
+        to retry, use: --limit @/home/frankc/.ansible-retry/webservers.retry
+ ____________
+< PLAY RECAP >
+ ------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+ec2-34-240-13-232.eu-west-1.compute.amazonaws.com : ok=9    changed=0    unreachable=0    failed=1
+ec2-34-250-227-208.eu-west-1.compute.amazonaws.com : ok=10   changed=0    unreachable=0    failed=0
+
+[frankc@octalfutures infinity]$ ls -l
+ansible.cfg         hosts               old_webservers.yml  webservers.yml
+.git/               new_webservers.yml  roles/
