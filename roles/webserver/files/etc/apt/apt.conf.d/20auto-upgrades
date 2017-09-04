@@ -1,0 +1,4 @@
+// /etc/apt/apt.conf.d/20auto-upgrades
+// Reference: https://help.ubuntu.com/community/AutomaticSecurityUpdates
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";

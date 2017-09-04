@@ -1,5 +1,10 @@
 ---
 
+- name: enable auto security upgrades via package management strategy
+  synchronize:
+    src:   etc/apt/apt.conf.d
+    dest: /etc/apt/
+
 - name: disable old-style apache (httpd) service
   service: name=httpd enabled=no state=stopped
   when: inventory_hostname in groups['old_webservers']
