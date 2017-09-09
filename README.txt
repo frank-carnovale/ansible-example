@@ -1,4 +1,4 @@
-"INFINITY WORKS" Technical Exercise
+"Ansible" Technical Exercise
 -----------------------------------
 
 Summary of Required Deliverables:
